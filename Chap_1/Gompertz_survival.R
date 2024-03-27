@@ -1,5 +1,6 @@
 
-setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_1")
+#setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_1")
+library(here)
 set.seed(101)
 
 ########## START IN-TEXT SNIPPET
@@ -10,7 +11,7 @@ lifetime_density = function(a, b, k){
   # Symbolic derivative with respect to age a
   density_function = D(gompertz_mortality, "a")
   # Evaluate derivative using specified values
-  eval(Expr)
+  eval(density_function)
 }
 ########## END IN-TEXT SNIPPET
 

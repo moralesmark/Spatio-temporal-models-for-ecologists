@@ -1,7 +1,7 @@
 
-
-setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_1")
-source( "../Shared_functions/add_legend.R" )
+library(here)
+#setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_1")
+source(here("Shared_functions/add_legend.R"))
 set.seed(101)
 
 ########## START IN-TEXT SNIPPET
@@ -48,7 +48,7 @@ loc_i = t(sapply( 1:n_indiv, FUN=simulate_location ))
 ########## END IN-TEXT SNIPPET
 
 # Plot
-png( paste0("Spatial distribution.png"), width=6, height=2, res=200, units="in" )
+png( paste0(here("Chap_1/Spatial distribution.png")), width=6, height=2, res=200, units="in" )
   par( mfrow=c(1,3), mgp=c(2,0.5,0), mar=c(3,3,1,1) )
   out = sf::st_as_sf(cbind("d"=d_g,"elev"=elev_g,loc_gz), coords = c("x","y"))
   out = stars::st_rasterize(out)
@@ -88,11 +88,11 @@ fit = glm( N ~ log(elev) + I(log(elev)^2), data=Data, family=poisson )
 Table = round(summary(fit)$coef,3)
 colnames(Table) = c("Estimate", "Standard Error", "T value", "Probability")
 rownames(Table) = c("Intercept", "log(elevation)", "log(elevation)^2")
-write.csv( Table, file=paste0("glm_summary_res",grid_size,".csv") )
+write.csv( Table, file=paste0(here("Chap_1/glm_summary_res"),grid_size,".csv") )
 
 # plot using sf
 grid_sf = st_sf(grid, N=N_i)
-png( paste0("gridded_density_res",grid_size,".png"), width=4, height=3, res=200, units="in")
+png( here("Chap_1", paste0("gridded_density_res",grid_size,".png")), width=4, height=3, res=200, units="in")
   breaks = pretty(c(0,N_i),n=11)
   plot( grid_sf, axes=TRUE, reset=FALSE, pal=sf.colors(n=length(breaks)-1, alpha=0.2), breaks=breaks, main="Gridded abundance" )
   plot( samples, add=TRUE, pch=20 )
@@ -105,8 +105,8 @@ dev.off()
 ########## START IN-TEXT SNIPPET
 # Compile and load TMB
 library(TMB)
-compile( "poisson_glm.cpp" )
-dyn.load("poisson_glm")
+compile( here("Chap_1/poisson_glm.cpp") )
+dyn.load(here("Chap_1/poisson_glm"))
 
 # Make covariate data
 formula = ~ log(elev) + I(log(elev)^2)
@@ -129,13 +129,13 @@ log_mu = Obj$report()$log_mu
 Table = round(summary(Opt$SD,"fixed"),3)
 colnames(Table) = c("Estimate", "Standard Error")
 rownames(Table) = c("Intercept", "log(elevation)", "log(elevation)^2")
-write.csv( Table, file=paste0("tmb_summary_res",grid_size,".csv") )
+write.csv( Table, file=here("Chap_1", paste0("tmb_summary_res",grid_size,".csv") ))
 
 #
 grid_sf$est_mu = exp(log_mu)
 grid_sf$true_mu = get_density( Data[,c("X","Y")] )
   grid_sf$true_mu = grid_sf$true_mu / sum(grid_sf$true_mu) * n_indiv
-png( paste0("estimated_density_res",grid_size,".png"), width=6, height=6, res=200, units="in")
+png( here("Chap_1", paste0("estimated_density_res",grid_size,".png")), width=6, height=6, res=200, units="in")
   par( mfrow=c(2,2) )
   plot( grid_sf["true_mu"], axes=TRUE, key.pos = NULL, pal=viridisLite::viridis(10), reset = FALSE )
   add_legend( round(range(grid_sf[["true_mu"]]),2), col=viridisLite::viridis(10), text_col="white" )
@@ -170,7 +170,7 @@ plot_ecdf( y=Data$N[4], ysim=Sim[4,], main="ECDF: sample 4" )
 plot_ecdf( y=Data$N[6], ysim=Sim[6,], main="ECDF: sample 6" )
 ########## END IN-TEXT SNIPPET
 
-png( file=paste0("simulation_residuals_res",grid_size,".png"), width=6, height=3, res=200, units="in")
+png( file=here("Chap_1", paste0("simulation_residuals_res",grid_size,".png")), width=6, height=3, res=200, units="in")
   par( mar=c(3,3,1,1), mgp=c(2,0.5,0), mfrow=c(1,2) )
   plot_ecdf( y=Data$N[4], ysim=Sim[4,], main="ECDF: sample 4" )
   plot_ecdf( y=Data$N[6], ysim=Sim[6,], main="ECDF: sample 6" )
@@ -190,7 +190,7 @@ dharmaRes = createDHARMa(simulatedResponse = Sim,
 plot( dharmaRes )
 ########## END IN-TEXT SNIPPET
 
-png( file=paste0("DHARMa_residuals_res",grid_size,".png"), width=7, height=4, res=200, units="in")
+png( file=here("Chap_1", paste0("DHARMa_residuals_res",grid_size,".png")), width=7, height=4, res=200, units="in")
   plot( dharmaRes )
 dev.off()
 
@@ -217,7 +217,7 @@ polygon( x=c(x_i,rev(x_i)), y=c(yci_zi[1,],rev(yci_zi[2,])), col=rgb(0,0,1,0.2) 
 ########## END IN-TEXT SNIPPET
 
 # Plot
-png( file=paste0("response_curve_res",grid_size,".png"), width=4, height=4, res=200, units="in")
+png( file=here("Chap_1", paste0("response_curve_res",grid_size,".png")), width=4, height=4, res=200, units="in")
   par( xaxs="i" )
   plot( x=x_i, y=ybar_i, log="x", type="l", lwd=2, col='blue', xlab="elevation", ylab="log-relative density", ylim=c(-30,2) )
   lines( x=x_i, y=ytrue_i, lwd=2, col="black")
@@ -232,7 +232,7 @@ dev.off()
 # Source marginaleffects functions
 library(marginaleffects)
 library(ggplot2)
-source( "../Shared_functions/marginaleffects.R" )
+source( here("Shared_functions/marginaleffects.R") )
 
 # Define input expected by marginaleffects functions
 fit = list( obj = Obj,
@@ -256,4 +256,4 @@ ggplot( as.data.frame(pred), aes(elev, estimate)) +
   scale_x_continuous(trans='log2') +
   labs(y="Predicted response")
 ########## END IN-TEXT SNIPPET
-ggsave( paste0("marginaleffects_curve_res",grid_size,".png"), device=png, width=4, height=4 )
+ggsave( here("Chap_1", paste0("marginaleffects_curve_res",grid_size,".png")), device=png, width=4, height=4 )
