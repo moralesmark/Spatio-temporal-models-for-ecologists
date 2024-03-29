@@ -1,13 +1,13 @@
 
 
-
-setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_2")
+library(here)
+#setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_2")
 
 #data_dir = "C:/Users/James.Thorson/Desktop/Work files/AFSC/2022-05 -- Barro Colorado data/"
 #load( paste0(data_dir,"bci.stem.Rdata31Aug2012/bci.stem1.rdata") )
 #vismba = subset( bci.stem1, sp %in% "vismba" )
 #saveRDS( vismba, "vismba.rds")
-vismba = readRDS( "vismba.rds" )
+vismba = readRDS( here("Chap_2/vismba.rds") )
 
 #       
 library(sf)
