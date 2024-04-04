@@ -1,12 +1,11 @@
 
-
-library(here)
 #setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_2")
 
 #data_dir = "C:/Users/James.Thorson/Desktop/Work files/AFSC/2022-05 -- Barro Colorado data/"
 #load( paste0(data_dir,"bci.stem.Rdata31Aug2012/bci.stem1.rdata") )
 #vismba = subset( bci.stem1, sp %in% "vismba" )
 #saveRDS( vismba, "vismba.rds")
+library(here)
 vismba = readRDS( here("Chap_2/vismba.rds") )
 
 #       
@@ -20,7 +19,7 @@ Count_i = tapply( samples$agb, INDEX=factor(unlist(grid_i),levels=1:length(grid)
 Data = data.frame( st_coordinates(st_centroid(grid)), "Count"=ifelse(is.na(Count_i),0,Count_i) )
 
 grid_sf = st_sf(grid, Count=Count_i)
-png( "gridded_density.png", width=5, height=2.5, res=200, units="in")
+png( here("Chap_2", "gridded_density.png"), width=5, height=2.5, res=200, units="in")
   plot( grid_sf, axes=TRUE, reset=FALSE, pal=sf.colors(n=10, alpha=0.2), breaks=seq(0,max(Data$Count),length=11) )
   plot( samples, add=TRUE, pch=20 )
 dev.off()
@@ -34,7 +33,7 @@ library(lme4)
 Data$Site = factor(1:nrow(Data))
 Lme = glmer( Count ~ 1 + (1|Site), data=Data, family=poisson(link = "log") )
 ########## END IN-TEXT SNIPPET
-capture.output(Lme, file="Lme_output.txt" )
+capture.output(Lme, file=here("Chap_2","Lme_output.txt") )
 
 #################
 # Demo
@@ -98,7 +97,7 @@ Hess = optimHess( par = opt1$par,
                   jnll = joint_nll )
 ########## END IN-TEXT SNIPPET
 parhat = cbind( "Estimate"=opt1$par, "SE"=sqrt(diag(solve(Hess))) )
-write.csv( signif(parhat,3), file="opt1_output.csv" )
+write.csv( signif(parhat,3), file= here("Chap_2","opt1_output.csv") )
 
 ###############
 # Improve R by providing gradient
@@ -138,7 +137,7 @@ Hess = optimHess( par = opt2$par,
 ########## END IN-TEXT SNIPPET
 final_grad = grad( opt2$par, plist=plist, Data=Data, random=random, jnll=joint_nll )
 parhat = cbind( "Estimate"=opt2$par, "SE"=sqrt(diag(solve(Hess))), "final_grad"=final_grad )
-write.csv( signif(parhat,c(3,3,3,3,12)), file="opt2_output.csv" )
+write.csv( signif(parhat,c(3,3,3,3,12)), file= here("Chap_2","opt2_output.csv") )
 
 ##############
 # Compare with TMB
@@ -147,8 +146,8 @@ write.csv( signif(parhat,c(3,3,3,3,12)), file="opt2_output.csv" )
 ########## START IN-TEXT SNIPPET
 # Compile and load TMB model
 library(TMB)
-compile("poisson_glmm.cpp")
-dyn.load("poisson_glmm")
+compile( here("Chap_2","poisson_glmm.cpp") )
+dyn.load( here("Chap_2", "poisson_glmm") )
 
 # Define inputs
 data = list( "y_i"=Data$Count )
@@ -166,7 +165,7 @@ Opt = nlminb( start=Obj$par, obj=Obj$fn, grad=Obj$gr )
 Opt$SD = sdreport( Obj, getJointPrecision=TRUE )
 ########## END IN-TEXT SNIPPET
 parhat = summary(Opt$SD, "fixed")
-write.csv( signif(cbind(parhat, Obj$gr(Opt$par)),c(3,3,3,3,12)), file="tmb_glmm.csv")
+write.csv( signif(cbind(parhat, Obj$gr(Opt$par)),c(3,3,3,3,12)), file= here( "Chap_2", "tmb_glmm.csv" ))
 
 #############
 # Replicate jointPrecision calculation
@@ -212,9 +211,9 @@ zapsmall(as.matrix(V_tmb - V_manual))
 # Visualize Hessian
 #############
 
-png( "TMB_hessian.png", width=4, height=4, res=200, unit="in")
+png( here("Chap_2", "TMB_hessian.png" ), width=4, height=4, res=200, unit="in")
   inner_hessian = Obj$env$spHess(par=Obj$env$last.par.best,random=TRUE)
-  Matrix::image( inner_hessian, main="Inner Hessian in TMB" )
+  Matrix::image( inner_hessian, main="Inner Hessian in TMB", colorkey = T )
 dev.off()
 
 # Visualize graph
@@ -226,7 +225,7 @@ M <- array(0, dim=c(length(names),length(names)), dimnames=list(names,names))
   M[grep("eps",names),'ln_SD'] = ""
   M[cbind(grep("Y",names),grep("eps",names))] = ""
 box.type = c( rep("circle",2), rep("diamond",n_groups), rep("square",n_groups) )
-png( "graph.png", width=7, height=3, res=200, un="in")
+png( here("Chap_2", "graph.png" ), width=7, height=3, res=200, un="in")
   par( mar=c(0,0,0,0) )
   plotmat( M, pos = c(2,n_groups,n_groups), curve = 0, name = names, lwd = 3, arr.pos = 0.6,
            box.lwd = 2, box.type = box.type, box.prop = 0.5, cex.txt=0.8 )
@@ -246,7 +245,7 @@ plot(fit, pars=setdiff(names(fit),"lp__"))
 ln_pred_stan = colMeans(extract(fit,'eps_i')[[1]])
 ln_pred_laplace = summary(Opt$SD,"random")[,'Estimate']
 grid_sf = st_sf(grid, "STAN"=exp(ln_pred_stan), "Laplace"=exp(ln_pred_laplace) )
-png( "gridded_predictions.png", width=6, height=2, res=200, units="in")
+png( here("Chap_2", "gridded_predictions.png") , width=6, height=2, res=200, units="in")
   par( mfrow=c(1,2) )
   plot( grid_sf[1], axes=TRUE, reset=FALSE, key.pos=NULL, pal=sf.colors(n=10, alpha=0.2), breaks=seq(0,max(Data$Count),length=11) )
   plot( samples, add=TRUE, pch=20 )
@@ -279,7 +278,7 @@ LL_jz = cbind(LL_jz, -neghalflogdetH_j )
 
 Glm0 = glm( Count ~ 1, data=Data, family=poisson(link = "log") )
 Glm1 = glm( Count ~ 0 + Site, data=Data, family=poisson(link = "log") )
-png( file="Shrinkage.png", width=5, height=5, res=200, units="in" )
+png( file= here("Chap_2","Shrinkage.png" ), width=5, height=5, res=200, units="in" )
   par( mfrow=c(2,1), mgp=c(2,0.5,0), mar=c(3,3,1,1), xaxs="i" )
   matplot( x=exp(ln_sd_set), y=LL_jz, type="l", lty="solid", col=c("blue","black","red"), lwd=2, log="x", xlab="", ylab="Values" )
     abline( v=exp(Opt$par['ln_sd']), lty="dotted" )
@@ -301,15 +300,16 @@ buggy_params$eps_i = rep(0, nrow(Data)+1)
 Obj = MakeADFun( data=data, parameters=buggy_params, random="eps_i" )
 
 # Display error
-my_log = file( "Inner_hessian_error.txt" )
+my_log = file( here("Chap_2", "Inner_hessian_error.txt" ) )
 sink( my_log, append = TRUE, type = "output")
 Obj$fn(Obj$par)
 sink( file=NULL )
+Obj$env$spHess(random = TRUE)
 
 # Visualize inner hessian
-png( "TMB_hessian_bug.png", width=4, height=4, res=200, unit="in")
+png( here("Chap_2", "TMB_hessian_bug.png" ), width=4, height=4, res=200, unit="in")
   inner_hessian = Obj$env$spHess(random=TRUE)
-  Matrix::image( inner_hessian, main="Inner Hessian in TMB\nwith non-invertible inner Hessian" )
+  Matrix::image( inner_hessian, main="Inner Hessian in TMB\nwith non-invertible inner Hessian", colorkey = TRUE )
 dev.off()
 
 ########## START IN-TEXT SNIPPET
@@ -342,10 +342,10 @@ Obj = MakeADFun( data=data, parameters=buggy_params, random="eps_i" )
 
 Opt = nlminb( start=Obj$par, objective=Obj$fn, gradient=Obj$gr )
 SD = sdreport( Obj )
-capture.output( SD, file="sdreport_error.txt")
+capture.output( SD, file= here("Chap_2", "sdreport_error.txt") )
 
 # Display error
-sink( file="Outer_hessian_error.txt", append = FALSE, type = "output")
+sink( file= here("Chap_2", "Outer_hessian_error.txt" ), append = FALSE, type = "output")
 geterrmessage()
 sink( file=NULL )
 

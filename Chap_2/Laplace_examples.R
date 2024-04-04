@@ -12,7 +12,7 @@ chi2 = function(x, k, order=0, log=FALSE ){
 #                   mvtnorm::dmvnorm(rep(0,3),sigma=2*diag(3)) * sqrt(det(2*diag(3)))*(2*pi)^(3/2)
 
 # Examples of Laplace approximation
-setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_2/")
+#setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_2/")
 
 ############ START IN-TEXT CODE
 # Calculate derivatives for log-density of chi-square distribution
@@ -48,7 +48,7 @@ plot_laplace(k = 100)
 # END IN-TEXT CODE
 
 # Plot
-png( file="Laplace_demo.png", width=7, height=3, res=200, unit="in")
+png( file=here( "Chap_2", "Laplace_demo.png" ), width=7, height=3, res=200, unit="in")
   par(mfrow=c(1,3), mar=c(3,3,3,1), mgp=c(2,0.5,0), xaxs="i")
   plot_laplace(k = 5)
   plot_laplace(k = 25)
@@ -82,7 +82,7 @@ plot_samples = function( k, xlim=c(0,k*3), xrange=c(0,k*5), ... ){
 }
 
 # Plot
-png( file="Rejection_sampling_demo.png", width=7, height=3, res=200, unit="in")
+png( file= here("Chap_2", "Rejection_sampling_demo.png" ), width=7, height=3, res=200, unit="in")
   par(mfrow=c(1,3), mar=c(3,3,3,1), mgp=c(2,0.5,0), xaxs="i")
   plot_samples(k = 5)
   plot_samples(k = 25)
