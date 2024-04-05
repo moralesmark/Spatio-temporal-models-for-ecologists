@@ -1,6 +1,7 @@
 
-setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_4")
-source( "../Shared_functions/build_ram.R" )
+#setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_4")
+library(here)
+source( here( "Shared_functions", "build_ram.R" ) )
 
 ##############
 # Simulate central-place foraging trips
@@ -47,7 +48,7 @@ plot_vectors = function( beta, gamma, xlim=c(-200,200), ylim=c(-200,200), ...){
 }
 
 set.seed(101)
-png( file="Preference.png", units="in", res=200, width=6, height=6 )
+png( file=here("Chap_4", "Preference.png" ), units="in", res=200, width=6, height=6 )
   par( mfrow=c(2,2), mar=c(3,3,2,0), mgp=c(2,0.5,0) )
   plot_vectors( beta=beta_t[1], gamma=gamma_t[1], main="Initial (t=1)" )
   plot_vectors( beta=beta_t[n_t/2], gamma=gamma_t[n_t/2], main="Intermediate (t=500)" )

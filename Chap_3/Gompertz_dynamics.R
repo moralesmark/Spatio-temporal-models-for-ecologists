@@ -1,5 +1,6 @@
 
-setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_3")
+#setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_3")
+library(here)
 
 # Illustrate Gompertz dynamics
 K = 3000
@@ -13,7 +14,7 @@ alpha = log(K) * beta
 x = seq( log(K/10), log(K*10), length=1000 )
 y = exp( alpha - beta*x )
 
-png( "Gompertz_production.png", width=3, height=3, res=200, unit="in" )
+png( here( "Chap_3", "Gompertz_production.png" ), width=3, height=3, res=200, unit="in" )
   par( mar=c(3,3,1,1), mgp=c(2,0.5,0), tck=-0.02 )
   matplot( x=exp(x), y=cbind(y,1), ylim=c(0.1,10), log="xy", lwd=2, type="l", col="black",
          lty=c("solid","dashed"), xlab=expression(n[t]), ylab=expression(lambda[t]) )
@@ -30,7 +31,7 @@ dev.off()
 
 ########## START IN-TEXT SNIPPET
 # Get abundance in KG
-Index_t = read.csv( file="Biomass_index.csv" )
+Index_t = read.csv( file=here( "Chap_3", "Biomass_index.csv" ))
 Index_t = array(Index_t[,2], dimnames=list(Index_t[,1]))
 Brange = range(Index_t) * c(0.8,1.2)
 Prange = c(0.5,2)
@@ -44,7 +45,7 @@ Lm = lm( y ~ 1 + x )
 # Plot
 xpred = seq(log(Brange[1]),log(Brange[2]),length=1000)
 ypred = predict.lm( Lm, newdata=data.frame("x"=xpred), se.fit=TRUE )
-png( "gompertz_data.png", width=7, height=4, unit='in', res=200 )
+png( here( "Chap_3", "gompertz_data.png"), width=7, height=4, unit='in', res=200 )
   par( mfrow=c(1,2), mar=c(3,3,1,1), mgp=c(2,0.5,0), tck=-0.02, xaxs="i", yaxs="i" )
   plot( x=names(Index_t), y=Index_t, log="y", type="p", main="Bimass timeseries", ylim=Brange, xlab=expression(t), ylab=expression(b[t]) )
   plot( y=exp(y-x), x=exp(x), log="xy", main="Production curve", ylim=Prange, xlim=Brange, xlab=expression(b[t]), ylab=expression(lambda[t]) )
@@ -86,7 +87,7 @@ sim = function( sigmaP, sigmaM, rho, n_t=1e6, K=3000 ){
   return( list("semivariance"=gamma_l, "correlation"=1-gamma_l/sill, "sill"=sill) )
 }
 
-png( file="Gompertz_semivariance.png", width=6, height=6, unit="in", res=200 )
+png( file=here( "Chap_3", "Gompertz_semivariance.png"), width=6, height=6, unit="in", res=200 )
   par(mfrow=c(2,2), mar=c(3,3,1,1), mgp=c(2,0.5,0), oma=c(2,2,2,0), xaxs="i", yaxs="i")
   Y = cbind( sim(sigmaP=sigmaP,sigmaM=0,rho=rho1)$semivar, sim(sigmaP=sigmaP,sigmaM=0,rho=rho2)$semivar )
   matplot( x=1:10, y=Y, type="p", ylim=c(0,0.6), xlim=c(0,10.5), xlab="", ylab="", col=c('black',"red"), pch=20, cex=1.5 )
@@ -122,7 +123,7 @@ M <- array(0, dim=c(length(names),length(names)), dimnames=list(names,names))
   M[cbind(grep("y",names),grep("x",names))] = ""
   M[cbind(match(paste0("x",2:n_groups),names),match(paste0("x",2:n_groups-1),names))] = ""
 box.type = c( rep("circle",3), rep("diamond",n_groups), rep("square",n_groups) )
-png( "graph.png", width=7, height=3, res=200, un="in")
+png( here( "Chap_3", "graph.png" ), width=7, height=3, res=200, un="in")
   par( mar=c(0,0,0,0) )
   plotmat( M, pos = c(3,n_groups,n_groups), curve = 0, name = names, lwd = 3, arr.pos = 0.6,
            box.lwd = 2, box.type = box.type, box.prop = 0.5, cex.txt=0.8 )
@@ -135,8 +136,8 @@ dev.off()
 ########## START IN-TEXT SNIPPET
 # Compile
 library(TMB)
-compile( "gompertz.cpp" )
-dyn.load( dynlib("gompertz") )
+compile( here( "Chap_3", "gompertz.cpp" ) )
+dyn.load( dynlib(here( "Chap_3", "gompertz") ))
 
 # Build inputs
 Data = list( "log_b_t"=log(Index_t), "log_bnew_z"=xpred, "simulate_t"=rep(0,length(Index_t)) )
@@ -150,13 +151,13 @@ opt_CAR$SD = sdreport( Obj )
 ########## END IN-TEXT SNIPPET
 
 #
-png( "gompertz_sparsity.png", width=4, height=4, unit='in', res=200 )
+png( here( "Chap_3",  "gompertz_sparsity.png" ), width=4, height=4, unit='in', res=200 )
   par( mar=c(3,3,1,1), mgp=c(2,0.5,0), tck=-0.02 )
   Matrix::image( Obj$env$spHess(par=Obj$env$last.par.best,random=TRUE) )
 dev.off()
 
 # Plot fit
-png( "gompertz_fit.png", width=7, height=4, unit='in', res=200 )
+png( here( "Chap_3", "gompertz_fit.png" ), width=7, height=4, unit='in', res=200 )
   par( mfrow=c(1,2), mar=c(3,3,1,1), mgp=c(2,0.5,0), tck=-0.02, xaxs="i", yaxs="i" )
   # Time-series
   out = data.frame( names(Index_t), as.list(opt_CAR$SD,"Est")$log_d_t, as.list(opt_CAR$SD,"Std")$log_d_t )
@@ -181,25 +182,25 @@ R = rho ^ as.matrix(dist(1:20))
 Q = solve(R)
 
 # Build inputs
-compile( "gompertz_SAR.cpp" )
-dyn.load( dynlib("gompertz_SAR") )
+compile(here( "Chap_3",  "gompertz_SAR.cpp" ))
+dyn.load( dynlib(here( "Chap_3", "gompertz_SAR") ))
 Data = list( "log_b_t"=log(Index_t), "log_bnew_z"=xpred )
 Parameters = list( "log_delta"=0, "log_sigmaP"=1, "log_sigmaM"=1, "alpha"=0, "rho"=0.76, "eps_t"=rep(0,length(Index_t)) )
 Random = c("eps_t")
 #Map = list("rho"=factor(NA))
 
 # Build and fit object
-Obj = MakeADFun(data=Data, parameters=Parameters, random=Random, DLL="gompertz_SAR" )  #
+Obj = MakeADFun(data=Data, parameters=Parameters, random=Random, DLL="gompertz_SAR")  #
 opt_SAR = nlminb( start=Obj$par, obj=Obj$fn, grad=Obj$gr )
 opt_SAR$SD = sdreport(Obj)
 
 # Compare two versions
 out = data.frame( "CAR params"=names(opt_CAR$par), signif(summary(opt_CAR$SD,"fixed"),3),
   "SAR params"=names(opt_SAR$par), signif(summary(opt_SAR$SD,"fixed"),3) )
-write.csv( out, file="TMB_comparison.csv", row.names=FALSE)
+write.csv( out, file=here( "Chap_3", "TMB_comparison.csv"), row.names=FALSE)
 
 # Plot fit
-png( "gompertz_fit_SAR.png", width=7, height=4, unit='in', res=200 )
+png( here( "Chap_3", "gompertz_fit_SAR.png" ), width=7, height=4, unit='in', res=200 )
   par( mfrow=c(1,2), mar=c(3,3,1,1), mgp=c(2,0.5,0), tck=-0.02, xaxs="i", yaxs="i" )
   # Time-series
   out = data.frame( names(Index_t), as.list(opt_SAR$SD,"Est",report=TRUE)$log_d_t, as.list(opt_SAR$SD,"Std",report=TRUE)$log_d_t )
@@ -255,7 +256,7 @@ out_2 = data.frame( "year" = years,
 ########### END IN-TEXT SNIPPET
 
 # Plot fit
-png( "gompertz_forecast.png", width=7, height=3, unit='in', res=200 )
+png( here( "Chap_3", "gompertz_forecast.png" ), width=7, height=3, unit='in', res=200 )
   par( mfrow=c(1,3), mar=c(3,2,4,1), mgp=c(2,0.5,0), tck=-0.02, xaxs="i", yaxs="i" )
   for(z in 1:3 ){
     if(z==1) out = out_1
