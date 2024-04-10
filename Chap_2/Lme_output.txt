@@ -1,5 +1,5 @@
-Generalized linear mixed model fit by maximum likelihood (Laplace Approximation) [
-glmerMod]
+Generalized linear mixed model fit by maximum likelihood (Laplace  Approximation)
+ [glmerMod]
  Family: poisson  ( log )
 Formula: Count ~ 1 + (1 | Site)
    Data: Data

@@ -94,7 +94,8 @@ Hess = optimHess( par = opt1$par,
                   plist = plist,
                   Data = Data,
                   random = random,
-                  jnll = joint_nll )
+                  jnll = joint_nll,
+                  control = list(trace=1) )
 ########## END IN-TEXT SNIPPET
 parhat = cbind( "Estimate"=opt1$par, "SE"=sqrt(diag(solve(Hess))) )
 write.csv( signif(parhat,3), file= here("Chap_2","opt1_output.csv") )

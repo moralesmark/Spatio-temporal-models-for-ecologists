@@ -67,8 +67,8 @@ dev.off()
 #############
 
 # Compile
-compile( "crawlTMB.cpp" )
-dyn.load( dynlib("crawlTMB") )
+compile( here("Chap_4", "crawlTMB.cpp") )
+dyn.load( dynlib(here("Chap_4", "crawlTMB") ) )
 
 #
 set.seed(4)
@@ -105,7 +105,7 @@ Opt$SD = sdreport( Obj )
 ########## END IN-TEXT SNIPPET
 
 # Plot sparsity
-png( "sparsity.png", width=4, height=4, unit='in', res=200 )
+png( here("Chap_4", "sparsity.png"), width=4, height=4, unit='in', res=200 )
   par( mar=c(3,3,1,1), mgp=c(2,0.5,0), tck=-0.02 )
   Matrix::image( Obj$env$spHess(par=Obj$env$last.par.best,random=TRUE) )
 dev.off()
@@ -123,7 +123,7 @@ plot_track = function( Opt, Data, x_iz, cols=1:2, which_include, ... ){
   quiver( x=X[which_include[-length(which_include)],1], y=X[which_include[-length(which_include)],2],
     u=diff(X[which_include,1]), v=diff(X[which_include,2]), col="green", length=0.1, scale=0.8 )
 }
-png( "fitted_diffusion.png", width=4, height=4, res=200, units="in" )
+png( here("Chap_4", "fitted_diffusion.png"), width=4, height=4, res=200, units="in" )
   plot_track( Opt=Opt, Data=Data, x_iz=x_iz, xlab="Eastings", ylab="Northings", which_include=which_include )
 dev.off()
 
@@ -138,7 +138,7 @@ Obj = MakeADFun(data=Data, parameters=Parameters, random=Random )
 Opt = nlminb( start=Obj$par, obj=Obj$fn, grad=Obj$gr )
 Opt$SD = sdreport( Obj )
 ########## START IN-TEXT SNIPPET
-png( "fitted_drift.png", width=4, height=4, res=200, units="in" )
+png( here("Chap_4", "fitted_drift.png"), width=4, height=4, res=200, units="in" )
   plot_track( Opt=Opt, Data=Data, x_iz=x_iz, xlab="Eastings", ylab="Northings", which_include=which_include )
 dev.off()
 
@@ -148,7 +148,7 @@ dev.off()
 
 library(sf)
 
-DF = read.csv("FSdata_2016.csv")
+DF = read.csv(here("Chap_4", "FSdata_2016.csv") )
 DF = st_as_sf(DF, coords=c("longitude","latitude"), crs="+proj=longlat" )
 DF = st_transform( DF, crs="+proj=utm +datum=WGS84 +units=km +zone=2" )
 
@@ -176,7 +176,7 @@ Data$y_iz[-which_include,] = NA
 Obj = MakeADFun(data=Data, parameters=Parameters, random=Random )  #
 Opt = nlminb( start=Obj$par, obj=Obj$fn, grad=Obj$gr )
 Opt$SD = sdreport( Obj )
-png( "fitted_NFS.png", width=4, height=4, res=200, units="in" )
+png( here("Chap_4", "fitted_NFS.png"), width=4, height=4, res=200, units="in" )
   plot_track( Opt=Opt, Data=Data, x_iz=st_coordinates(DF), xlab="Eastings (km)", ylab="Northings (km)", which_include=which_include )
 dev.off()
 
@@ -229,7 +229,7 @@ dimnames(V_zz) = list( colnames(y_iz), colnames(y_iz) )
 
 # Visualize habitat
 set.seed(101)
-png( file="Tracks-Correlated.png", units="in", res=200, width=6, height=6 )
+png( file=here("Chap_4", "Tracks-Correlated.png"), units="in", res=200, width=6, height=6 )
   par( mfrow=c(2,2), mar=c(3,3,2,0), mgp=c(2,0.5,0) )
   plot_vectors( beta=beta_t[1], gamma=gamma_t[1], main="Initial (t=1)" )
   plot_vectors( beta=beta_t[n_t/2], gamma=gamma_t[n_t/2], main="Intermediate (t=500)" )
@@ -244,7 +244,7 @@ png( file="Tracks-Correlated.png", units="in", res=200, width=6, height=6 )
 dev.off()
 
 # Visualize tracks
-png( "fitted_joint.png", width=8, height=8, res=200, units="in" )
+png( here("Chap_4", "fitted_joint.png"), width=8, height=8, res=200, units="in" )
   par( mfrow=c(2,2), mar=c(2,2,2,0) )
   for(track in 1:n_tracks) plot_track( Opt=Opt, Data=Data, x_iz=x_iz, cols=1:2+2*(track-1),
     main=paste("Animal",track), xlab="Eastings", ylab="Northings", which_include=which_include ) # , xlim=c(-200,200), ylim=c(-20,200)
@@ -288,7 +288,7 @@ Opt2$AIC = 2*Opt2$objective + 2*length(Opt2$par)
 V2_zz = Obj$report()$V_zz
 dimnames(V2_zz) = list( colnames(y_iz), colnames(y_iz) )
 
-png( "fitted_joint-tracks.png", width=8, height=4, res=200, units="in" )
+png( here("Chap_4", "fitted_joint-tracks.png"), width=8, height=4, res=200, units="in" )
   par( mfrow=c(1,3), oma=c(0,0,0,0), mar=c(2,2,2,0) )
   plot_track( Opt=Opt, Data=Data, x_iz=x_iz, cols=1:2, main="Independent-and-equal", which_include=which_include )
     legend("bottomright", legend=paste0("AIC = ",signif(Opt$AIC,4)), bty="n" )
@@ -299,7 +299,7 @@ png( "fitted_joint-tracks.png", width=8, height=4, res=200, units="in" )
 dev.off()
 
 # Plot covariance
-png( "fitted_joint-covariance.png", width=8, height=4, res=200, units="in" )
+png( here("Chap_4", "fitted_joint-covariance.png"), width=8, height=4, res=200, units="in" )
   par( mfrow=c(1,3), mar=c(0,0,0,0), oma=c(5,5,5,5) )
   corrplot::corrplot( (V_zz), is.corr=FALSE, tl.pos="lt", type="lower", col=viridisLite::viridis(20), cl.cex=0.8, cl.length=6 )
   mtext( side=3, text="Independent-and-equal", line=0 )
