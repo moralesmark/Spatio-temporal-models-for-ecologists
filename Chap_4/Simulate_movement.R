@@ -246,8 +246,11 @@ dev.off()
 # Visualize tracks
 png( here("Chap_4", "fitted_joint.png"), width=8, height=8, res=200, units="in" )
   par( mfrow=c(2,2), mar=c(2,2,2,0) )
-  for(track in 1:n_tracks) plot_track( Opt=Opt, Data=Data, x_iz=x_iz, cols=1:2+2*(track-1),
-    main=paste("Animal",track), xlab="Eastings", ylab="Northings", which_include=which_include ) # , xlim=c(-200,200), ylim=c(-20,200)
+  for(track in 1:n_tracks) {
+    plot_track( Opt=Opt, Data=Data, x_iz=x_iz, cols=1:2+2*(track-1),
+    main=paste("Animal",track), xlab="Eastings", ylab="Northings", 
+    which_include=which_include ) # , xlim=c(-200,200), ylim=c(-20,200)
+  }
 dev.off()
 
 # Switch to factor model
