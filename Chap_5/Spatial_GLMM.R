@@ -1,6 +1,6 @@
 
 # Data processed from: C:\Users\James.Thorson\Desktop\Work files\AFSC\2022-06 -- Breeding Bird survey
-setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_5")
+setwd("C:/temp/2024_spring_spatiotemporal_modeling_UW_thorson/Spatio-temporal-models-for-ecologists/Chap_5")
 source("../Shared_functions/add_legend.R")
 
 library(sf)

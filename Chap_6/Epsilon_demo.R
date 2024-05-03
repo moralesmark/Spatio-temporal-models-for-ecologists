@@ -1,5 +1,5 @@
 
-setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_6")
+setwd("C:/temp/2024_spring_spatiotemporal_modeling_UW_thorson/Spatio-temporal-models-for-ecologists/Chap_6")
 
 # COmpile
 TMB::compile( "epsilon_estimator.cpp" )

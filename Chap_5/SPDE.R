@@ -1,6 +1,6 @@
 
 # Data processed from: C:\Users\James.Thorson\Desktop\Work files\AFSC\2022-06 -- Breeding Bird survey
-setwd("C:/Users/James.Thorson/Desktop/Git/Spatio-temporal-models-for-ecologists/Chap_5")
+setwd("C:/temp/2024_spring_spatiotemporal_modeling_UW_thorson/Spatio-temporal-models-for-ecologists/Chap_5")
 source("../Shared_functions/add_legend.R")
 
 library(sf)
@@ -64,7 +64,7 @@ png(file="SPDE_explanation_pt2.png", width=9, height=3, res=200, units="in")
   Points( X=1:mesh$n, Y=1:mesh$n, Z=as.matrix(spde$g2) )
 dev.off()
 
-png(file="SPDE_explanation_pt2.png", width=9, height=3, res=200, units="in")
+png(file="SPDE_explanation_pt3.png", width=9, height=3, res=200, units="in")
   par( mfrow=c(1,3), mar=c(2,2,2,0), mgp=c(2,0.5,0), tck=-0.02, xaxs="i", yaxs='i')
   # Visualize SPDE approx.
   Col = colorRampPalette(colors=c("blue","white","red"))
@@ -150,12 +150,12 @@ png(file="SPDE_mesh.png", width=8, height=4, res=200, units="in")
 dev.off()
 
 library(gridExtra)
-png(file="SPDE_matrices.png", width=7, height=3, res=200, units="in")
+#png(file="SPDE_matrices.png", width=7, height=3, res=200, units="in")
   m0 = image(spde$c0, colorkey=FALSE, sub=paste0("Nonzero: ",prod(dim(spde$c0))-sum(spde$c0==0)), main=expression(M[0]) ) #, useRaster=TRUE)
   m1 = image(spde$g1, colorkey=FALSE, sub=paste0("Nonzero: ",prod(dim(spde$g1))-sum(spde$g1==0)), main=expression(M[1])) #, useRaster=TRUE)
   m2 = image(spde$g2, colorkey=FALSE, sub=paste0("Nonzero: ",prod(dim(spde$g2))-sum(spde$g2==0)), main=expression(M[2])) #, useRaster=TRUE)
   grid.arrange(m0, m1, m2, ncol=3)
-dev.off()
+#dev.off()
 
 # COmpile
 compile( "SPDE.cpp" )
@@ -167,7 +167,7 @@ Data = list( "c_i"=out$SpeciesTotal, "A_is"=A_is, "A_gs"=A_gs,
              "M0"=spde$c0, "M1"=spde$g1, "M2"=spde$g2 )
 Params = list( "beta0"=0, "ln_tau"=0, "ln_kappa"=0,
                "omega_s"=rnorm(nrow(spde$c0)) )
-Obj = MakeADFun( data=Data, parameters=Params, random="omega_s" )
+Obj = MakeADFun( data=Data, parameters=Params, random="omega_s", DLL = "SPDE" )
 
 # Optimize
 Opt = nlminb( start=Obj$par, obj=Obj$fn, grad=Obj$gr )
