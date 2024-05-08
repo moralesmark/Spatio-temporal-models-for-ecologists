@@ -1,5 +1,5 @@
 
-setwd( R'(C:\Users\James.Thorson\Desktop\Git\Spatio-temporal-models-for-ecologists\Chap_7)' )
+setwd("C:/temp/2024_spring_spatiotemporal_modeling_UW_thorson/Spatio-temporal-models-for-ecologists/Chap_7")
 source( "../Shared_functions/rmvnorm_prec.R" )
 
 library(sf)

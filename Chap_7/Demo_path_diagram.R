@@ -1,6 +1,5 @@
 
-
-setwd( R'(C:\Users\James.Thorson\Desktop\Git\Spatio-temporal-models-for-ecologists\Chap_7)' )
+setwd("C:/temp/2024_spring_spatiotemporal_modeling_UW_thorson/Spatio-temporal-models-for-ecologists/Chap_7")
 source( "../Shared_functions/build_ram.R" )
 
 library(mvtnorm)
@@ -131,7 +130,7 @@ Params = list( x_iz = Data$y_iz,
 Map = list( "x_iz" = factor(cbind(NA,NA,1:nrow(Data$y_iz))) )
 
 # Make TMB object
-Obj = MakeADFun( data=Data, parameters=Params, map=Map, random="x_iz" )
+Obj = MakeADFun( data=Data, parameters=Params, map=Map, random="x_iz", DLL = "SEMGLM" )
 Opt = nlminb( objective=Obj$fn, grad=Obj$gr, start=Obj$par )
 Opt$SD = sdreport( Obj )
 
@@ -149,7 +148,7 @@ sem::pathDiagram( model = mysem,
                   file = tempdir(),
                   graphics.fmt = "png",
                   output.type = "graphics" )
-file.rename( from=paste0(tempdir(),".png"), to="path.png" )
+#file.rename( from=paste0("C:/Users/Mark/AppData/Local/Temp/", ".png"), to="path.png" )
 
 # Run simulation experiment
 Results = array( NA, dim=c(100,6), dimnames=list(NULL,c("Intercept","C","T","Collinearity","Extrapolation","Counterfactual")) )
@@ -164,7 +163,7 @@ for( r in 1:100 ){
   # SEM fit
   Data$y_iz = cbind(C,T,N)
   Params$x_iz = Data$y_iz
-  Obj = MakeADFun( data=Data, parameters=Params, map=Map, random="x_iz" )
+  Obj = MakeADFun( data=Data, parameters=Params, map=Map, random="x_iz", DLL = "SEMGLM" )
   Obj$env$beSilent()
   Opt = nlminb( objective=Obj$fn, grad=Obj$gr, start=Obj$par )
   Opt$SD = sdreport( Obj )
